@@ -12,7 +12,7 @@ help:
 
 clean:
 	@echo "Cleaning..."
-	@rm -rf build dist *.egg-info
+	@rm -rf build dist *.egg-info *.egg .tox
 	@find . -name \*.pyc -delete
 
 compile: clean
