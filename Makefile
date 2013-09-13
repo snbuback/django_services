@@ -33,5 +33,5 @@ dist: clean
 	@python setup.py sdist
 
 publish: clean
-	@python setup.py sdist upload -r pypi
+	@python setup.py sdist upload -r pip
 
