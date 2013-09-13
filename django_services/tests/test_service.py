@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
-from django_services.service import base as svc
+from django_services import service as svc
 
 
 class TestModel(MagicMock):
@@ -28,16 +28,17 @@ class ServiceForTest(svc.BaseService):
 class BaseServiceTest(TestCase):
 
     def test_after_instantiate_put_user_as_instance_attribute(self):
-        request = HttpRequest()
-        request.user = User()
-        service = ServiceForTest(request)
-        self.assertIs(request.user, service.user)
+        user = User()
+        service = ServiceForTest(user=user)
+        self.assertIs(user, service.user)
+        self.assertIsNone(service.request)
 
     def test_after_instantiate_put_request_as_instance_attribute(self):
         request = HttpRequest()
         request.user = User()
         service = ServiceForTest(request)
         self.assertIs(request, service.request)
+        self.assertIs(request.user, service.user)
 
 
 class CRUDServiceTest(TestCase):

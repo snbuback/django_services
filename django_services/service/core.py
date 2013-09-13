@@ -135,8 +135,7 @@ class BaseService(object):
     def __init__(self, request=None, user=None):
         assert request or user, 'Both request and user are None'
         self.request = request
-        if user is None:
-            self.user = request.user
+        self.user = user or request.user
         assert self.model_class is not None, 'model_class'
 
     @nocheckpermission()
