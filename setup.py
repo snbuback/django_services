@@ -46,7 +46,7 @@ setup(
     license='APACHE2',
     packages=find_packages('.', exclude=('testproject*',)),
     include_package_data=True,
-    require=['Django', 'mock'],
+    require=['Django', 'mock', 'djangorestframework'],
     tests_require=['tox'],
     cmdclass = {'test': Tox},
 )

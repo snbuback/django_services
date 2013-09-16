@@ -1,0 +1,59 @@
+{% extends "rest_framework/api.html" %}
+{% load static %}
+
+{% block style %}
+{{block.super}}
+    <link rel="stylesheet" type="text/css" href="{% static "css/docs.css" %}"/>
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+<!-- Content -->
+<div id="content" class="container">
+    <div class="row">
+
+        <div class="span3">
+            <ul id="nav-api" class="nav nav-list affix bs-docs-sidenav" data-spy="affix">
+                <li>
+                    <a href="#begin">
+                        <i class="icon-chevron-right"></i><i class="icon-home"></i>
+                    </a>
+                </li>
+                {% for api_doc in api_doc_list %}
+                <li>
+                    <a href="#{{api_doc.name}}">
+                        <i class="icon-chevron-right"></i>{{api_doc.name}}
+                    </a>
+                </li>
+                {% endfor %}
+                {% block extracontent-header %}{% endblock %}
+            </ul>
+        </div>
+
+        <div class="span9">
+            <h1 id="begin">DjangoService API Help</h1>
+            <p>
+                This page help you to understand all APIs.
+            </p>
+            
+            {% for api_doc in api_doc_list %}
+            <h2 id="{{api_doc.name}}">{{api_doc.name}}<a href='{{api_doc.url}}'>{{api_doc.url}}</a></h2>
+            <div class='documentation'>
+                {{api_doc.documentation}}
+            </div>
+            {% endfor %}
+
+            {% block extracontent %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+<script type="text/javascript">
+    $('body').scrollspy();
+</script>
+{% endblock %}
