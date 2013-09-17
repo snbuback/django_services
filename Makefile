@@ -42,4 +42,5 @@ publish: increment_version upload
 	@git commit -m 'incremented version' -- django_services/__init__.py
 	@git tag v`egrep -o "'.*'" django_services/__init__.py | tr -d \'`
 	@git push --tags
+	@git push
 
