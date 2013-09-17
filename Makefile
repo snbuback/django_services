@@ -32,6 +32,14 @@ install:
 dist: clean
 	@python setup.py sdist
 
-publish: clean
+upload: clean
 	@python setup.py sdist upload -r pip
+
+increment_version:
+	@python -c "import django_services; VERSION = django_services.VERSION.split('.') ; VERSION[2] = str(int(VERSION[2])+1); f = open('django_services/__init__.py', 'w'); f.write('VERSION = \'%s\'\n' % '.'.join(VERSION)); f.close()"
+
+publish: increment_version upload
+	@git commit -m 'incremented version' -- django_services/__init__.py
+	@git tag v`egrep -o "'.*'" django_services/__init__.py | tr -d \'`
+	@git push --tags
 
