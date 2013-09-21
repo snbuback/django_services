@@ -6,7 +6,7 @@ from functools import wraps
 from django.http import Http404
 from rest_framework import generics, mixins, status, viewsets
 from rest_framework.response import Response
-from .exceptions import InvalidOperationException
+from django_services.service.exceptions import InvalidOperationException
 
 LIST = 'list'
 CREATE = 'create'
