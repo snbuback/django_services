@@ -154,3 +154,4 @@ class DjangoServicesAdmin(admin.ModelAdmin):
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context, current_app=self.admin_site.name)
+

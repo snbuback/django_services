@@ -27,6 +27,7 @@ class UpdateServiceMixin(object):
 
     def update(self, obj):
         LOG.info(u'Updating %s - %s', type(obj).__name__, obj)
+        self.validate(obj)
         obj.save()
 
 
