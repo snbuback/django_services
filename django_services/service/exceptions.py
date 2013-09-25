@@ -5,8 +5,8 @@ class ApplicationException(Exception):
     def __init__(self, *args, **kwargs):
         if len(args) > 1:
             self.message = args[0]
-        elif kwargs.get('message', None):
-            self.message = kwargs['message']
+        elif 'message' in kwargs:
+            self.message = kwargs.pop('message')
         super(ApplicationException, self).__init__(*args, **kwargs)
 
     def get_message(self):
