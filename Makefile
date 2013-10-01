@@ -1,13 +1,14 @@
 help:
 	@echo
 	@echo "Please use 'make <target>' where <target> is one of"
-	@echo "  clean      to clean garbage left by builds and installation"
-	@echo "  compile    to compile .py files (just to check for syntax errors)"
-	@echo "  install    to install"
-	@echo "  build      to build without installing"
-	@echo "  dist       to create egg for distribution"
-	@echo "  publish    to publish the package to PyPI"
-	@echo "  test       to run tests"
+	@echo "	 clean		to clean garbage left by builds and installation"
+	@echo "	 compile	to compile .py files (just to check for syntax errors)"
+	@echo "	 install	to install"
+	@echo "	 build		to build without installing"
+	@echo "	 dist		to create egg for distribution"
+	@echo "	 publish	to publish the package to PyPI"
+	@echo "	 test		to run tests"
+	@echo "	 pip		to install some dependecies"
 	@echo
 
 clean:
@@ -22,6 +23,10 @@ compile: clean
 
 test: clean
 	@python django_services/runtests/runtests.py
+
+pip: # install pip libraries
+	@pip install -r requirements.txt
+	@pip install -r requirements_test.txt
 
 build:
 	@python setup.py build
