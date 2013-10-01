@@ -4,19 +4,22 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.util import unquote, get_deleted_objects
+from django.contrib.admin.util import unquote, get_deleted_objects, model_ngettext
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, force_text
 from django.utils.html import escape
 from django.views.decorators.csrf import csrf_protect
+from django.contrib.admin import helpers
+from django.utils.translation import ugettext_lazy, ugettext as _
 
 csrf_protect_m = method_decorator(csrf_protect)
 login_required_m = method_decorator(login_required)
 
 class DjangoServicesAdmin(admin.ModelAdmin):
-
+    
+    actions = ['delete_selected']
+    
     def __init__(self, *args, **kwargs):
         if getattr(self, 'service_class', None) is None:
             raise RuntimeError("Missing service_class attribute on %s" % self.__class__.__name__)
@@ -155,3 +158,79 @@ class DjangoServicesAdmin(admin.ModelAdmin):
             "admin/delete_confirmation.html"
         ], context, current_app=self.admin_site.name)
 
+    def delete_selected(self, request, queryset):
+        """
+        Overrides django's default delete_selected action do call _model_.delete() to
+        pass through services
+
+        Default action which deletes the selected objects.
+
+        This action first displays a confirmation page whichs shows all the
+        deleteable objects, or, if the user has no permission one of the related
+        childs (foreignkeys), a "permission denied" message.
+
+        Next, it delets all selected objects and redirects back to the change list.
+        """
+        opts = self.model._meta
+        app_label = opts.app_label
+
+        # Check that the user has delete permission for the actual model
+        if not self.has_delete_permission(request):
+            raise PermissionDenied
+
+        using = router.db_for_write(self.model)
+
+        # Populate deletable_objects, a data structure of all related objects that
+        # will also be deleted.
+        deletable_objects, perms_needed, protected = get_deleted_objects(
+            queryset, opts, request.user, self.admin_site, using)
+
+        # The user has already confirmed the deletion.
+        # Do the deletion and return a None to display the change list view again.
+        if request.POST.get('post'):
+            if perms_needed:
+                raise PermissionDenied
+            n = queryset.count()
+            if n:
+                for obj in queryset:
+                    obj_display = force_text(obj)
+                    self.log_deletion(request, obj, obj_display)
+                    #remove the object
+                    self.delete_model(request, obj)
+
+                self.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
+                    "count": n, "items": model_ngettext(self.opts, n)
+                })
+            # Return None to display the change list page again.
+            return None
+
+        if len(queryset) == 1:
+            objects_name = force_text(opts.verbose_name)
+        else:
+            objects_name = force_text(opts.verbose_name_plural)
+
+        if perms_needed or protected:
+            title = _("Cannot delete %(name)s") % {"name": objects_name}
+        else:
+            title = _("Are you sure?")
+
+        context = {
+            "title": title,
+            "objects_name": objects_name,
+            "deletable_objects": [deletable_objects],
+            'queryset': queryset,
+            "perms_lacking": perms_needed,
+            "protected": protected,
+            "opts": opts,
+            "app_label": app_label,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }
+
+        # Display the confirmation page
+        return TemplateResponse(request, self.delete_selected_confirmation_template or [
+            "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/delete_selected_confirmation.html" % app_label,
+            "admin/delete_selected_confirmation.html"
+        ], context, current_app=self.admin_site.name)
+
+    delete_selected.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")
