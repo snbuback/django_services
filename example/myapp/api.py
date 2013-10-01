@@ -1,8 +1,16 @@
 from django_services.api import DjangoServiceAPI, register
 from .models import Brand, Model, Car
-from .service import BrandService
-from .serializers import BrandSerializer
+from .service import BrandService, CarService, ModelService
+from .serializers import BrandSerializer, CarSerializer, ModelSerializer
 
+class CarAPI(DjangoServiceAPI):
+    serializer_class = CarSerializer
+    service_class = CarService
+
+class ModelAPI(DjangoServiceAPI):
+    serializer_class = ModelSerializer
+    service_class = ModelService
+    
 class BrandAPI(DjangoServiceAPI):
     """
     *   ### __List Virtual Machines__
@@ -43,3 +51,5 @@ class BrandAPI(DjangoServiceAPI):
 
 
 register('brand', BrandAPI)
+register('car', CarAPI)
+register('model', ModelAPI)
