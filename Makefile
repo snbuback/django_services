@@ -15,6 +15,7 @@ clean:
 	@echo "Cleaning..."
 	@rm -rf build dist *.egg-info *.egg .tox
 	@find . -name \*.pyc -delete
+	@git clean -xdf
 
 compile: clean
 	@echo "Compiling source code..."
