@@ -57,6 +57,7 @@ class ListServiceMixin(object):
         LOG.debug(u'Querying %s by filters=%s', self.model_class.__name__, filters)
         query = self.__queryset__()
         perm = build_permission_name(self.model_class, 'view')
+        LOG.debug(u"Checking if user %s has_perm %s" % (self.user, perm))
         query_with_permission = filter(lambda o: self.user.has_perm(perm, obj=o), query)
         ids = map(lambda o: o.pk, query_with_permission)
 
